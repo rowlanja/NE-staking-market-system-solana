@@ -1,11 +1,11 @@
 import * as anchor from "@project-serum/anchor";
-import { AnchorError, Program } from "@project-serum/anchor";
+// ** Comment this to use solpg imported IDL **
 import { Workspace } from "../target/types/workspace";
 
 describe("workspace", () => {
-  const testNftTitle = "Beta";
-  const testNftSymbol = "BETA";
-  const testNftUri = "https://raw.githubusercontent.com/Coding-and-Crypto/Solana-NFT-Marketplace/master/assets/example.json";
+  const testNftTitle = "x";
+  const testNftSymbol = "x";
+  const testNftUri = "x";
 
   const provider = anchor.AnchorProvider.env()
   const wallet = provider.wallet as anchor.Wallet;
@@ -55,6 +55,18 @@ describe("workspace", () => {
     await program.methods.mint(
       testNftTitle, testNftSymbol, testNftUri
     )
+    .accounts({
+      masterEdition: masterEditionAddress,
+      metadata: metadataAddress,
+      mint: mintKeypair.publicKey,
+      tokenAccount: tokenAddress,
+      mintAuthority: wallet.publicKey,
+      tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+    })
+    .signers([mintKeypair])
+    .rpc();
+
+    await program.methods.updateUri()
     .accounts({
       masterEdition: masterEditionAddress,
       metadata: metadataAddress,

@@ -11,6 +11,7 @@ use {
     mpl_token_metadata::{
         ID as TOKEN_METADATA_ID,
         instruction as token_instruction,
+        state::DataV2,
     },
 };
 
@@ -19,7 +20,8 @@ declare_id!("8ZThaLXF5KaNZn1jGaHuBFzhSHqv4VNRwmgBSiGESpU6");
 
 
 #[program]
-pub mod mint_nft {
+pub mod workspace {
+
     use super::*;
 
     pub fn mint(
@@ -28,6 +30,9 @@ pub mod mint_nft {
         metadata_symbol: String, 
         metadata_uri: String,
     ) -> Result<()> {
+        let testNftTitle = String::from("Beta");
+        let testNftSymbol = String::from("BETA");
+        let testNftUri = String::from("https://raw.githubusercontent.com/Coding-and-Crypto/Solana-NFT-Marketplace/master/assets/example.json");
 
         msg!("Creating mint account...");
         msg!("Mint: {}", &ctx.accounts.mint.key());
@@ -101,9 +106,9 @@ pub mod mint_nft {
                 ctx.accounts.mint_authority.key(), 
                 ctx.accounts.mint_authority.key(), 
                 ctx.accounts.mint_authority.key(), 
-                metadata_title, 
-                metadata_symbol, 
-                metadata_uri, 
+                testNftTitle, 
+                testNftSymbol, 
+                testNftUri, 
                 None,
                 1,
                 true, 
@@ -144,6 +149,48 @@ pub mod mint_nft {
         )?;
 
         msg!("Token mint process completed successfully.");
+
+        Ok(())
+    }
+
+    pub fn updateUri(
+        ctx: Context<MintNft>, 
+    ) -> Result<()> {
+
+        let testNftTitle = String::from("Beta");
+        let testNftSymbol = String::from("BETA");
+        let testNftUri = String::from("https://raw.githubusercontent.com/rowlanja/NFTPrinter/boog/outputDir/json/example.json");
+        let data = Some(DataV2 {
+            name: testNftTitle,
+            symbol: testNftSymbol,
+            uri: testNftUri,
+            seller_fee_basis_points: 0,
+            creators: None,
+            collection: None,
+            uses: None,
+        });
+       
+        msg!("Updating metadata account...");
+        msg!("Metadata account address: {}", &ctx.accounts.metadata.to_account_info().key());
+        invoke(
+            &token_instruction::update_metadata_accounts_v2(
+                TOKEN_METADATA_ID, 
+                ctx.accounts.metadata.key(), 
+                ctx.accounts.mint_authority.key(), 
+                Some(ctx.accounts.mint_authority.key()), 
+                data,
+                Some(true),
+                Some(true)
+            ),
+            &[
+                ctx.accounts.metadata.to_account_info(),
+                ctx.accounts.mint.to_account_info(),
+                ctx.accounts.token_account.to_account_info(),
+                ctx.accounts.mint_authority.to_account_info(),
+                ctx.accounts.rent.to_account_info(),
+            ],
+        )?;
+        msg!("Token update process completed successfully.");
 
         Ok(())
     }
