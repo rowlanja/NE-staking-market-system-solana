@@ -112,7 +112,7 @@ pub mod workspace {
                 None,
                 1,
                 true, 
-                false, 
+                true, 
                 None, 
                 None,
             ),
@@ -153,14 +153,17 @@ pub mod workspace {
         Ok(())
     }
 
-    pub fn updateUri(
+    pub fn update(
         ctx: Context<MintNft>, 
+        metadata_title: String, 
+        metadata_symbol: String, 
+        metadata_uri: String,
     ) -> Result<()> {
 
         let testNftTitle = String::from("Beta");
         let testNftSymbol = String::from("BETA");
         let testNftUri = String::from("https://raw.githubusercontent.com/rowlanja/NFTPrinter/boog/outputDir/json/example.json");
-        let data = Some(DataV2 {
+        let data = DataV2 {
             name: testNftTitle,
             symbol: testNftSymbol,
             uri: testNftUri,
@@ -168,7 +171,7 @@ pub mod workspace {
             creators: None,
             collection: None,
             uses: None,
-        });
+        };
        
         msg!("Updating metadata account...");
         msg!("Metadata account address: {}", &ctx.accounts.metadata.to_account_info().key());
@@ -177,9 +180,9 @@ pub mod workspace {
                 TOKEN_METADATA_ID, 
                 ctx.accounts.metadata.key(), 
                 ctx.accounts.mint_authority.key(), 
-                Some(ctx.accounts.mint_authority.key()), 
-                data,
-                Some(true),
+                None,
+                Some(data),
+                None,
                 Some(true)
             ),
             &[

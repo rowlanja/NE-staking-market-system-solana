@@ -66,7 +66,9 @@ describe("workspace", () => {
     .signers([mintKeypair])
     .rpc();
 
-    await program.methods.updateUri()
+    await program.methods.update(
+      testNftTitle, testNftSymbol, testNftUri
+    )
     .accounts({
       masterEdition: masterEditionAddress,
       metadata: metadataAddress,
