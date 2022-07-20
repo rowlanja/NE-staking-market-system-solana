@@ -1,7 +1,9 @@
 [features]
 seeds = false
+
 [programs.devnet]
 workspace = "8ZThaLXF5KaNZn1jGaHuBFzhSHqv4VNRwmgBSiGESpU6"
+staking = "7bKzGRwzjfeDNafZh7iQZziHRznbXRLHqq27VVzs9fHa"
 
 [registry]
 url = "https://anchor.projectserum.com"

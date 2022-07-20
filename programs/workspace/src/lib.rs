@@ -149,6 +149,24 @@ pub mod workspace {
         )?;
 
         msg!("Token mint process completed successfully.");
+        msg!("Transfering Lamports.");
+
+        let from = ctx.accounts.from.to_account_info();
+        let to = ctx.accounts.to.to_account_info();
+        let _lamports: u64  = 100000000;
+
+        let from = &mut ctx.accounts.from;
+        let to = &mut ctx.accounts.to;
+
+        let ix = anchor_lang::solana_program::system_instruction::transfer(
+            &from.key, &to.key, _lamports,
+        );
+
+        anchor_lang::solana_program::program::invoke(
+            &ix,
+            &[from.to_account_info(), to.to_account_info().clone()],
+        ).expect("Error in transfering the sol ...");
+        msg!("Transfering Lamports Successful.");
 
         Ok(())
     }
@@ -221,4 +239,10 @@ pub struct MintNft<'info> {
     pub associated_token_program: Program<'info, associated_token::AssociatedToken>,
     /// CHECK: Metaplex will check this
     pub token_metadata_program: UncheckedAccount<'info>,
+    #[account(mut, signer)]
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub from: AccountInfo<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub to: AccountInfo<'info>,
 }

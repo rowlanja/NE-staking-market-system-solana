@@ -1,6 +1,8 @@
 import * as anchor from "@project-serum/anchor";
 // ** Comment this to use solpg imported IDL **
 import { Workspace } from "../target/types/workspace";
+import { publicKey } from "@project-serum/anchor/dist/cjs/utils";
+import { Program } from "@project-serum/anchor";
 
 describe("workspace", () => {
   const testNftTitle = "x";
@@ -17,9 +19,13 @@ describe("workspace", () => {
   const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
   );
+  let to = new anchor.web3.PublicKey(
+    "GHCUftQjt661rUJgdymbJpGfsXeg3nzYDBHHDw1vcjNe"
+  );
   it("Mint!", async () => {
 
     // Derive the mint address and the associated token account address
+    const toKeypair: anchor.web3.Keypair = anchor.web3.Keypair.generate();
 
     const mintKeypair: anchor.web3.Keypair = anchor.web3.Keypair.generate();
     const tokenAddress = await anchor.utils.token.associatedAddress({
@@ -51,7 +57,9 @@ describe("workspace", () => {
     console.log("Master edition metadata initialized");
 
     // Transact with the "mint" function in our on-chain program
-    
+    const sol_from = await provider.wallet
+    const sol_to = await anchor.web3.Keypair.generate()
+
     await program.methods.mint(
       testNftTitle, testNftSymbol, testNftUri
     )
@@ -62,6 +70,8 @@ describe("workspace", () => {
       tokenAccount: tokenAddress,
       mintAuthority: wallet.publicKey,
       tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+      to:  toKeypair.publicKey,
+      from: sol_from.publicKey,
     })
     .signers([mintKeypair])
     .rpc();
@@ -76,6 +86,8 @@ describe("workspace", () => {
       tokenAccount: tokenAddress,
       mintAuthority: wallet.publicKey,
       tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+      to:  sol_from.publicKey,
+      from: sol_from.publicKey,
     })
     .signers([mintKeypair])
     .rpc();
